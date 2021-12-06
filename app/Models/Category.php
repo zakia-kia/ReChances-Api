@@ -17,7 +17,7 @@ class Category extends Model
         'name'
     ];
 
-     public function product(){
-        return $this->belongsTo(product::class);
+    public function product(){
+        return $this->hashMany(product::class);
     }
 }
