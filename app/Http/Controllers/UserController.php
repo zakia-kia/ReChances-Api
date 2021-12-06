@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\validator;
 use Illuminate\Support\Str;
+use App\Models\Product;
 
 class UserController extends Controller
 {

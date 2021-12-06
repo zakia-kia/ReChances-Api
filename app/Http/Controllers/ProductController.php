@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 
 class ProductController extends Controller
 {
@@ -19,6 +20,34 @@ class ProductController extends Controller
         $status = 'success show all data';
         return response()->json(compact('status', 'product'),200);
     }
+//filter
+     public function filter(Request $request) 
+     {
+        $product_query = Product::with(['category']);
+         
+        if ($request->category) {
+            $product_query->whereHas('category',function($query) use($request){
+                $query->where('name', $request->category);
+            });
+        }
+
+        $product = $product_query->get();
+        return response()->json([
+            'message' => 'successfully',
+            'data' =>$product
+        ], 200);
+    }
+//search 
+     function search($name)
+     {
+         return Product::where("name","like","%".$name."%" ) ->get();
+     }
+
+     function searchLoc($location)
+     {
+         return Product::where("location","like","%".$location."%" ) ->get(); 
+     }
+    
 
     /**
      * Store a newly created resource in storage.
@@ -40,8 +69,10 @@ class ProductController extends Controller
 
         $request->validate([
             'name' => 'required',
+            'user_id' => 'required',
             'desc' => 'required',
             'price' => 'required',
+            'location' => 'required',
             'category_id' => 'required',
             'image' => ' required|image|mimes:jpeg,png,jpg,giv,svg|max:2048',
         ]);
@@ -70,7 +101,7 @@ class ProductController extends Controller
     public function showById($id)
     {
         $product = Product::find($id);
-        $status = 'success show product by id category';
+        $status = 'success show product by id ';
         return response()->json(compact('status','product'),200);
     }
 
@@ -97,8 +128,16 @@ class ProductController extends Controller
             $product->price = $data['price'];
         }
 
+         if (isset($data['location'])&& !empty ($data['location'])) {
+            $product->location = $data['location'];
+        }
+
         if (isset($data['category_id'])&& !empty ($data['category_id'])) {
             $product->category_id = $data['category_id'];
+        }
+
+        if (isset($data['user_id'])&& !empty ($data['user_id'])) {
+            $product->user_id = $data['user_id'];
         }
 
         if (isset($data['image'])&& !empty ($data['image'])) {
